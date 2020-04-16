@@ -1,7 +1,7 @@
 // import Alert from './alert'
 // import Button from './button'
 // import Carousel from './carousel'
-// import Collapse from './collapse'
+import Collapse from './collapse'
 // import Dropdown from './dropdown'
 // import Modal from './modal'
 // import Popover from './popover'
@@ -23,7 +23,7 @@ export {
   // Alert,
   // Button,
   // Carousel,
-  // Collapse,
+  Collapse,
   // Dropdown,
   // Modal,
   // Popover,

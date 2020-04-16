@@ -1,6 +1,6 @@
 /*!
-  * Bootstrap collapse.js v4.4.1 (https://getbootstrap.com/)
-  * Copyright 2011-2019 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+  * Custom Bootstrap collapse.js v4.4.1 (https://getbootstrap.com/)
+  * Copyright 2011-2020 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
   */
 (function (global, factory) {
@@ -83,12 +83,11 @@
    * ------------------------------------------------------------------------
    */
 
-  var NAME = 'collapse';
-  var VERSION = '4.4.1';
+  var NAME = 'collapse'; // const VERSION             = '4.4.1'
+
   var DATA_KEY = 'bs.collapse';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
-  var JQUERY_NO_CONFLICT = $.fn[NAME];
   var Default = {
     toggle: true,
     parent: ''
@@ -107,8 +106,8 @@
   var ClassName = {
     SHOW: 'show',
     COLLAPSE: 'collapse',
-    COLLAPSING: 'collapsing',
-    COLLAPSED: 'collapsed'
+    COLLAPSING: 'collapsing' // COLLAPSED  : 'collapsed'
+
   };
   var Dimension = {
     WIDTH: 'width',
@@ -131,8 +130,8 @@
       this._isTransitioning = false;
       this._element = element;
       this._config = this._getConfig(config);
-      this._triggerArray = [].slice.call(document.querySelectorAll("[data-toggle=\"collapse\"][href=\"#" + element.id + "\"]," + ("[data-toggle=\"collapse\"][data-target=\"#" + element.id + "\"]")));
-      var toggleList = [].slice.call(document.querySelectorAll(Selector.DATA_TOGGLE));
+      this._triggerArray = [].slice.call(document.querySelectorAll(this.constructor.Selector.DATA_TOGGLE + "[href=\"#" + element.id + "\"]," + (this.constructor.Selector.DATA_TOGGLE + "[data-target=\"#" + element.id + "\"]")));
+      var toggleList = [].slice.call(document.querySelectorAll(this.constructor.Selector.DATA_TOGGLE));
 
       for (var i = 0, len = toggleList.length; i < len; i++) {
         var elem = toggleList[i];
@@ -158,13 +157,16 @@
         this.toggle();
       }
     } // Getters
+    // static get VERSION() {
+    //   return VERSION
+    // }
 
 
     var _proto = Collapse.prototype;
 
     // Public
     _proto.toggle = function toggle() {
-      if ($(this._element).hasClass(ClassName.SHOW)) {
+      if ($(this._element).hasClass(this.constructor.ClassName.SHOW)) {
         this.hide();
       } else {
         this.show();
@@ -174,7 +176,7 @@
     _proto.show = function show() {
       var _this = this;
 
-      if (this._isTransitioning || $(this._element).hasClass(ClassName.SHOW)) {
+      if (this._isTransitioning || $(this._element).hasClass(this.constructor.ClassName.SHOW)) {
         return;
       }
 
@@ -182,12 +184,12 @@
       var activesData;
 
       if (this._parent) {
-        actives = [].slice.call(this._parent.querySelectorAll(Selector.ACTIVES)).filter(function (elem) {
+        actives = [].slice.call(this._parent.querySelectorAll(this.constructor.Selector.ACTIVES)).filter(function (elem) {
           if (typeof _this._config.parent === 'string') {
             return elem.getAttribute('data-parent') === _this._config.parent;
           }
 
-          return elem.classList.contains(ClassName.COLLAPSE);
+          return elem.classList.contains(_this.constructor.ClassName.COLLAPSE);
         });
 
         if (actives.length === 0) {
@@ -196,14 +198,14 @@
       }
 
       if (actives) {
-        activesData = $(actives).not(this._selector).data(DATA_KEY);
+        activesData = $(actives).not(this._selector).data(this.constructor.DATA_KEY);
 
         if (activesData && activesData._isTransitioning) {
           return;
         }
       }
 
-      var startEvent = $.Event(Event.SHOW);
+      var startEvent = $.Event(this.constructor.Event.SHOW);
       $(this._element).trigger(startEvent);
 
       if (startEvent.isDefaultPrevented()) {
@@ -211,31 +213,32 @@
       }
 
       if (actives) {
-        Collapse._jQueryInterface.call($(actives).not(this._selector), 'hide');
+        this.constructor._jQueryInterface(this.constructor).call($(actives).not(this._selector), 'hide');
 
         if (!activesData) {
-          $(actives).data(DATA_KEY, null);
+          $(actives).data(this.constructor.DATA_KEY, null);
         }
       }
 
       var dimension = this._getDimension();
 
-      $(this._element).removeClass(ClassName.COLLAPSE).addClass(ClassName.COLLAPSING);
+      $(this._element).removeClass(this.constructor.ClassName.COLLAPSE).addClass(this.constructor.ClassName.COLLAPSING);
       this._element.style[dimension] = 0;
 
       if (this._triggerArray.length) {
-        $(this._triggerArray).removeClass(ClassName.COLLAPSED).attr('aria-expanded', true);
+        $(this._triggerArray) // .removeClass(this.constructor.ClassName.COLLAPSED)
+        .attr('aria-expanded', true);
       }
 
       this.setTransitioning(true);
 
       var complete = function complete() {
-        $(_this._element).removeClass(ClassName.COLLAPSING).addClass(ClassName.COLLAPSE).addClass(ClassName.SHOW);
+        $(_this._element).removeClass(_this.constructor.ClassName.COLLAPSING).addClass(_this.constructor.ClassName.COLLAPSE).addClass(_this.constructor.ClassName.SHOW);
         _this._element.style[dimension] = '';
 
         _this.setTransitioning(false);
 
-        $(_this._element).trigger(Event.SHOWN);
+        $(_this._element).trigger(_this.constructor.Event.SHOWN);
       };
 
       var capitalizedDimension = dimension[0].toUpperCase() + dimension.slice(1);
@@ -248,11 +251,11 @@
     _proto.hide = function hide() {
       var _this2 = this;
 
-      if (this._isTransitioning || !$(this._element).hasClass(ClassName.SHOW)) {
+      if (this._isTransitioning || !$(this._element).hasClass(this.constructor.ClassName.SHOW)) {
         return;
       }
 
-      var startEvent = $.Event(Event.HIDE);
+      var startEvent = $.Event(this.constructor.Event.HIDE);
       $(this._element).trigger(startEvent);
 
       if (startEvent.isDefaultPrevented()) {
@@ -263,7 +266,7 @@
 
       this._element.style[dimension] = this._element.getBoundingClientRect()[dimension] + "px";
       Util.reflow(this._element);
-      $(this._element).addClass(ClassName.COLLAPSING).removeClass(ClassName.COLLAPSE).removeClass(ClassName.SHOW);
+      $(this._element).addClass(this.constructor.ClassName.COLLAPSING).removeClass(this.constructor.ClassName.COLLAPSE).removeClass(this.constructor.ClassName.SHOW);
       var triggerArrayLength = this._triggerArray.length;
 
       if (triggerArrayLength > 0) {
@@ -274,8 +277,9 @@
           if (selector !== null) {
             var $elem = $([].slice.call(document.querySelectorAll(selector)));
 
-            if (!$elem.hasClass(ClassName.SHOW)) {
-              $(trigger).addClass(ClassName.COLLAPSED).attr('aria-expanded', false);
+            if (!$elem.hasClass(this.constructor.ClassName.SHOW)) {
+              $(trigger) // .addClass(this.constructor.ClassName.COLLAPSED)
+              .attr('aria-expanded', false);
             }
           }
         }
@@ -286,7 +290,7 @@
       var complete = function complete() {
         _this2.setTransitioning(false);
 
-        $(_this2._element).removeClass(ClassName.COLLAPSING).addClass(ClassName.COLLAPSE).trigger(Event.HIDDEN);
+        $(_this2._element).removeClass(_this2.constructor.ClassName.COLLAPSING).addClass(_this2.constructor.ClassName.COLLAPSE).trigger(_this2.constructor.Event.HIDDEN);
       };
 
       this._element.style[dimension] = '';
@@ -299,7 +303,7 @@
     };
 
     _proto.dispose = function dispose() {
-      $.removeData(this._element, DATA_KEY);
+      $.removeData(this._element, this.constructor.DATA_KEY);
       this._config = null;
       this._parent = null;
       this._element = null;
@@ -309,10 +313,11 @@
     ;
 
     _proto._getConfig = function _getConfig(config) {
-      config = _objectSpread2({}, Default, {}, config);
+      var dataAttributes = $(this._element).data();
+      config = _objectSpread2({}, this.constructor.Default, {}, dataAttributes, {}, typeof config === 'object' && config ? config : {});
       config.toggle = Boolean(config.toggle); // Coerce string values
 
-      Util.typeCheckConfig(NAME, config, DefaultType);
+      Util.typeCheckConfig(this.constructor.NAME, config, this.constructor.DefaultType);
       return config;
     };
 
@@ -336,7 +341,7 @@
         parent = document.querySelector(this._config.parent);
       }
 
-      var selector = "[data-toggle=\"collapse\"][data-parent=\"" + this._config.parent + "\"]";
+      var selector = this.constructor.Selector.DATA_TOGGLE + "[data-parent=\"" + this._config.parent + "\"]";
       var children = [].slice.call(parent.querySelectorAll(selector));
       $(children).each(function (i, element) {
         _this3._addAriaAndCollapsedClass(Collapse._getTargetFromElement(element), [element]);
@@ -345,10 +350,11 @@
     };
 
     _proto._addAriaAndCollapsedClass = function _addAriaAndCollapsedClass(element, triggerArray) {
-      var isOpen = $(element).hasClass(ClassName.SHOW);
+      var isOpen = $(element).hasClass(this.constructor.ClassName.SHOW);
 
       if (triggerArray.length) {
-        $(triggerArray).toggleClass(ClassName.COLLAPSED, !isOpen).attr('aria-expanded', isOpen);
+        $(triggerArray) // .toggleClass(this.constructor.ClassName.COLLAPSED, !isOpen)
+        .attr('aria-expanded', isOpen);
       }
     } // Static
     ;
@@ -358,41 +364,87 @@
       return selector ? document.querySelector(selector) : null;
     };
 
-    Collapse._jQueryInterface = function _jQueryInterface(config) {
-      return this.each(function () {
-        var $this = $(this);
-        var data = $this.data(DATA_KEY);
+    Collapse._jQueryInterface = function _jQueryInterface(Class) {
+      return function (config) {
+        return this.each(function () {
+          var data = $(this).data(Class.DATA_KEY);
 
-        var _config = _objectSpread2({}, Default, {}, $this.data(), {}, typeof config === 'object' && config ? config : {});
+          var _config = typeof config === 'object' && config;
 
-        if (!data && _config.toggle && /show|hide/.test(config)) {
-          _config.toggle = false;
-        }
-
-        if (!data) {
-          data = new Collapse(this, _config);
-          $this.data(DATA_KEY, data);
-        }
-
-        if (typeof config === 'string') {
-          if (typeof data[config] === 'undefined') {
-            throw new TypeError("No method named \"" + config + "\"");
+          if (!data && _config.toggle && /show|hide/.test(config)) {
+            _config.toggle = false;
           }
 
-          data[config]();
+          if (!data) {
+            data = new Class(this, _config);
+            $(this).data(Class.DATA_KEY, data);
+          }
+
+          if (typeof config === 'string') {
+            if (typeof data[config] === 'undefined') {
+              throw new TypeError("No method named \"" + config + "\"");
+            }
+
+            data[config]();
+          }
+        });
+      };
+    };
+
+    Collapse._dataAPI = function _dataAPI(Class) {
+      return function (event) {
+        // preventDefault only for <a> elements (which change the URL) not inside the collapsible element
+        if (event.currentTarget.tagName === 'A') {
+          event.preventDefault();
         }
-      });
+
+        var $trigger = $(this);
+        var selector = Util.getSelectorFromElement(this);
+        var selectors = [].slice.call(document.querySelectorAll(selector));
+        $(selectors).each(function () {
+          var $target = $(this);
+          var data = $target.data(Class.DATA_KEY);
+          var config = data ? 'toggle' : $trigger.data();
+
+          Class._jQueryInterface(Class).call($target, config);
+        });
+      };
     };
 
     _createClass(Collapse, null, [{
-      key: "VERSION",
-      get: function get() {
-        return VERSION;
-      }
-    }, {
       key: "Default",
       get: function get() {
         return Default;
+      }
+    }, {
+      key: "NAME",
+      get: function get() {
+        return NAME;
+      }
+    }, {
+      key: "DATA_KEY",
+      get: function get() {
+        return DATA_KEY;
+      }
+    }, {
+      key: "Event",
+      get: function get() {
+        return Event;
+      }
+    }, {
+      key: "DefaultType",
+      get: function get() {
+        return DefaultType;
+      }
+    }, {
+      key: "ClassName",
+      get: function get() {
+        return ClassName;
+      }
+    }, {
+      key: "Selector",
+      get: function get() {
+        return Selector;
       }
     }]);
 
@@ -405,35 +457,23 @@
    */
 
 
-  $(document).on(Event.CLICK_DATA_API, Selector.DATA_TOGGLE, function (event) {
-    // preventDefault only for <a> elements (which change the URL) not inside the collapsible element
-    if (event.currentTarget.tagName === 'A') {
-      event.preventDefault();
-    }
-
-    var $trigger = $(this);
-    var selector = Util.getSelectorFromElement(this);
-    var selectors = [].slice.call(document.querySelectorAll(selector));
-    $(selectors).each(function () {
-      var $target = $(this);
-      var data = $target.data(DATA_KEY);
-      var config = data ? 'toggle' : $trigger.data();
-
-      Collapse._jQueryInterface.call($target, config);
-    });
-  });
+  $(document).on(Collapse.Event.CLICK_DATA_API, Collapse.Selector.DATA_TOGGLE, Collapse._dataAPI(Collapse));
   /**
    * ------------------------------------------------------------------------
    * jQuery
    * ------------------------------------------------------------------------
    */
 
-  $.fn[NAME] = Collapse._jQueryInterface;
-  $.fn[NAME].Constructor = Collapse;
+  var JQUERY_NO_CONFLICT = $.fn[Collapse.NAME];
 
-  $.fn[NAME].noConflict = function () {
-    $.fn[NAME] = JQUERY_NO_CONFLICT;
-    return Collapse._jQueryInterface;
+  var plugin = Collapse._jQueryInterface(Collapse);
+
+  $.fn[Collapse.NAME] = plugin;
+  $.fn[Collapse.NAME].Constructor = Collapse;
+
+  $.fn[Collapse.NAME].noConflict = function () {
+    $.fn[Collapse.NAME] = JQUERY_NO_CONFLICT;
+    return plugin;
   };
 
   return Collapse;
