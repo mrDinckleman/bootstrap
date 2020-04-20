@@ -648,6 +648,254 @@
   };
 
   /**
+   * ------------------------------------------------------------------------
+   * Constants
+   * ------------------------------------------------------------------------
+   */
+
+  var NAME$1 = 'toast'; // const VERSION            = '4.4.1'
+
+  var DATA_KEY$1 = 'bs.toast';
+  var EVENT_KEY$1 = "." + DATA_KEY$1;
+  var Event$1 = {
+    CLICK_DISMISS: "click.dismiss" + EVENT_KEY$1,
+    HIDE: "hide" + EVENT_KEY$1,
+    HIDDEN: "hidden" + EVENT_KEY$1,
+    SHOW: "show" + EVENT_KEY$1,
+    SHOWN: "shown" + EVENT_KEY$1
+  };
+  var ClassName$1 = {
+    FADE: 'fade',
+    HIDE: 'hide',
+    SHOW: 'show',
+    SHOWING: 'showing'
+  };
+  var DefaultType$1 = {
+    animation: 'boolean',
+    autohide: 'boolean',
+    delay: 'number'
+  };
+  var Default$1 = {
+    animation: true,
+    autohide: true,
+    delay: 500
+  };
+  var Selector$1 = {
+    DATA_DISMISS: '[data-dismiss="toast"]'
+  };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
+
+  var Toast =
+  /*#__PURE__*/
+  function () {
+    function Toast(element, config) {
+      this._element = element;
+      this._config = this._getConfig(config);
+      this._timeout = null;
+
+      this._setListeners();
+    } // Getters
+    // static get VERSION() {
+    //   return VERSION
+    // }
+
+
+    var _proto = Toast.prototype;
+
+    // Public
+    _proto.show = function show() {
+      var _this = this;
+
+      var showEvent = $.Event(this.constructor.Event.SHOW);
+      $(this._element).trigger(showEvent);
+
+      if (showEvent.isDefaultPrevented()) {
+        return;
+      }
+
+      if (this._config.animation) {
+        this._element.classList.add(this.constructor.ClassName.FADE);
+      }
+
+      var complete = function complete() {
+        _this._element.classList.remove(_this.constructor.ClassName.SHOWING);
+
+        _this._element.classList.add(_this.constructor.ClassName.SHOW);
+
+        $(_this._element).trigger(_this.constructor.Event.SHOWN);
+
+        if (_this._config.autohide) {
+          _this._timeout = setTimeout(function () {
+            _this.hide();
+          }, _this._config.delay);
+        }
+      };
+
+      this._element.classList.remove(this.constructor.ClassName.HIDE);
+
+      Util.reflow(this._element);
+
+      this._element.classList.add(this.constructor.ClassName.SHOWING);
+
+      if (this._config.animation) {
+        var transitionDuration = Util.getTransitionDurationFromElement(this._element);
+        $(this._element).one(Util.TRANSITION_END, complete).emulateTransitionEnd(transitionDuration);
+      } else {
+        complete();
+      }
+    };
+
+    _proto.hide = function hide() {
+      if (!this._element.classList.contains(this.constructor.ClassName.SHOW)) {
+        return;
+      }
+
+      var hideEvent = $.Event(this.constructor.Event.HIDE);
+      $(this._element).trigger(hideEvent);
+
+      if (hideEvent.isDefaultPrevented()) {
+        return;
+      }
+
+      this._close();
+    };
+
+    _proto.dispose = function dispose() {
+      clearTimeout(this._timeout);
+      this._timeout = null;
+
+      if (this._element.classList.contains(this.constructor.ClassName.SHOW)) {
+        this._element.classList.remove(this.constructor.ClassName.SHOW);
+      }
+
+      $(this._element).off(this.constructor.Event.CLICK_DISMISS);
+      $.removeData(this._element, this.constructor.DATA_KEY);
+      this._element = null;
+      this._config = null;
+    } // Private
+    ;
+
+    _proto._getConfig = function _getConfig(config) {
+      var dataAttributes = $(this._element).data();
+      config = _objectSpread2({}, this.constructor.Default, {}, dataAttributes, {}, typeof config === 'object' && config ? config : {});
+      Util.typeCheckConfig(this.constructor.NAME, config, this.constructor.DefaultType);
+      return config;
+    };
+
+    _proto._setListeners = function _setListeners() {
+      var _this2 = this;
+
+      $(this._element).on(this.constructor.Event.CLICK_DISMISS, this.constructor.Selector.DATA_DISMISS, function () {
+        return _this2.hide();
+      });
+    };
+
+    _proto._close = function _close() {
+      var _this3 = this;
+
+      var complete = function complete() {
+        _this3._element.classList.add(_this3.constructor.ClassName.HIDE);
+
+        $(_this3._element).trigger(_this3.constructor.Event.HIDDEN);
+      };
+
+      this._element.classList.remove(this.constructor.ClassName.SHOW);
+
+      if (this._config.animation) {
+        var transitionDuration = Util.getTransitionDurationFromElement(this._element);
+        $(this._element).one(Util.TRANSITION_END, complete).emulateTransitionEnd(transitionDuration);
+      } else {
+        complete();
+      }
+    } // Static
+    ;
+
+    Toast._jQueryInterface = function _jQueryInterface(Class) {
+      return function (config) {
+        return this.each(function () {
+          var data = $(this).data(Class.DATA_KEY);
+
+          var _config = typeof config === 'object' && config;
+
+          if (!data) {
+            data = new Class(this, _config);
+            $(this).data(Class.DATA_KEY, data);
+          }
+
+          if (typeof config === 'string') {
+            if (typeof data[config] === 'undefined') {
+              throw new TypeError("No method named \"" + config + "\"");
+            }
+
+            data[config]();
+          }
+        });
+      };
+    };
+
+    _createClass(Toast, null, [{
+      key: "DefaultType",
+      get: function get() {
+        return DefaultType$1;
+      }
+    }, {
+      key: "Default",
+      get: function get() {
+        return Default$1;
+      }
+    }, {
+      key: "NAME",
+      get: function get() {
+        return NAME$1;
+      }
+    }, {
+      key: "DATA_KEY",
+      get: function get() {
+        return DATA_KEY$1;
+      }
+    }, {
+      key: "Event",
+      get: function get() {
+        return Event$1;
+      }
+    }, {
+      key: "ClassName",
+      get: function get() {
+        return ClassName$1;
+      }
+    }, {
+      key: "Selector",
+      get: function get() {
+        return Selector$1;
+      }
+    }]);
+
+    return Toast;
+  }();
+  /**
+   * ------------------------------------------------------------------------
+   * jQuery
+   * ------------------------------------------------------------------------
+   */
+
+
+  var JQUERY_NO_CONFLICT$1 = $.fn[Toast.NAME];
+
+  var plugin$1 = Toast._jQueryInterface(Toast);
+
+  $.fn[Toast.NAME] = plugin$1;
+  $.fn[Toast.NAME].Constructor = Toast;
+
+  $.fn[Toast.NAME].noConflict = function () {
+    $.fn[Toast.NAME] = JQUERY_NO_CONFLICT$1;
+    return plugin$1;
+  };
+
+  /**
    * --------------------------------------------------------------------------
    * Bootstrap (v4.4.1): tools/sanitizer.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
@@ -2370,14 +2618,14 @@
    * ------------------------------------------------------------------------
    */
 
-  var NAME$1 = 'tooltip'; // const VERSION               = '4.4.1'
+  var NAME$2 = 'tooltip'; // const VERSION               = '4.4.1'
 
-  var DATA_KEY$1 = 'bs.tooltip';
-  var EVENT_KEY$1 = "." + DATA_KEY$1; // const CLASS_PREFIX          = 'bs-tooltip'
+  var DATA_KEY$2 = 'bs.tooltip';
+  var EVENT_KEY$2 = "." + DATA_KEY$2; // const CLASS_PREFIX          = 'bs-tooltip'
   // const BSCLS_PREFIX_REGEX    = new RegExp(`(^|\\s)${CLASS_PREFIX}\\S+`, 'g')
 
   var DISALLOWED_ATTRIBUTES = ['sanitize', 'whiteList', 'sanitizeFn'];
-  var DefaultType$1 = {
+  var DefaultType$2 = {
     animation: 'boolean',
     template: 'string',
     title: '(string|element|function)',
@@ -2402,7 +2650,7 @@
     BOTTOM: 'bottom',
     LEFT: 'left'
   };
-  var Default$1 = {
+  var Default$2 = {
     animation: true,
     template: '<div class="tooltip" role="tooltip">' + '<div class="arrow"></div>' + '<div class="tooltip-inner"></div></div>',
     trigger: 'hover focus',
@@ -2424,23 +2672,23 @@
     SHOW: 'show',
     OUT: 'out'
   };
-  var Event$1 = {
-    HIDE: "hide" + EVENT_KEY$1,
-    HIDDEN: "hidden" + EVENT_KEY$1,
-    SHOW: "show" + EVENT_KEY$1,
-    SHOWN: "shown" + EVENT_KEY$1,
-    INSERTED: "inserted" + EVENT_KEY$1,
-    CLICK: "click" + EVENT_KEY$1,
-    FOCUSIN: "focusin" + EVENT_KEY$1,
-    FOCUSOUT: "focusout" + EVENT_KEY$1,
-    MOUSEENTER: "mouseenter" + EVENT_KEY$1,
-    MOUSELEAVE: "mouseleave" + EVENT_KEY$1
+  var Event$2 = {
+    HIDE: "hide" + EVENT_KEY$2,
+    HIDDEN: "hidden" + EVENT_KEY$2,
+    SHOW: "show" + EVENT_KEY$2,
+    SHOWN: "shown" + EVENT_KEY$2,
+    INSERTED: "inserted" + EVENT_KEY$2,
+    CLICK: "click" + EVENT_KEY$2,
+    FOCUSIN: "focusin" + EVENT_KEY$2,
+    FOCUSOUT: "focusout" + EVENT_KEY$2,
+    MOUSEENTER: "mouseenter" + EVENT_KEY$2,
+    MOUSELEAVE: "mouseleave" + EVENT_KEY$2
   };
-  var ClassName$1 = {
+  var ClassName$2 = {
     FADE: 'fade',
     SHOW: 'show'
   };
-  var Selector$1 = {
+  var Selector$2 = {
     TOOLTIP: '.tooltip',
     TOOLTIP_INNER: '.tooltip-inner',
     ARROW: '.arrow'
@@ -3041,42 +3289,42 @@
     _createClass(Tooltip, null, [{
       key: "Default",
       get: function get() {
-        return Default$1;
+        return Default$2;
       }
     }, {
       key: "NAME",
       get: function get() {
-        return NAME$1;
+        return NAME$2;
       }
     }, {
       key: "DATA_KEY",
       get: function get() {
-        return DATA_KEY$1;
+        return DATA_KEY$2;
       }
     }, {
       key: "Event",
       get: function get() {
-        return Event$1;
+        return Event$2;
       }
     }, {
       key: "EVENT_KEY",
       get: function get() {
-        return EVENT_KEY$1;
+        return EVENT_KEY$2;
       }
     }, {
       key: "DefaultType",
       get: function get() {
-        return DefaultType$1;
+        return DefaultType$2;
       }
     }, {
       key: "ClassName",
       get: function get() {
-        return ClassName$1;
+        return ClassName$2;
       }
     }, {
       key: "Selector",
       get: function get() {
-        return Selector$1;
+        return Selector$2;
       }
     }]);
 
@@ -3089,19 +3337,20 @@
    */
 
 
-  var JQUERY_NO_CONFLICT$1 = $.fn[Tooltip.NAME];
+  var JQUERY_NO_CONFLICT$2 = $.fn[Tooltip.NAME];
 
-  var plugin$1 = Tooltip._jQueryInterface(Tooltip);
+  var plugin$2 = Tooltip._jQueryInterface(Tooltip);
 
-  $.fn[Tooltip.NAME] = plugin$1;
+  $.fn[Tooltip.NAME] = plugin$2;
   $.fn[Tooltip.NAME].Constructor = Tooltip;
 
   $.fn[Tooltip.NAME].noConflict = function () {
-    $.fn[Tooltip.NAME] = JQUERY_NO_CONFLICT$1;
-    return plugin$1;
+    $.fn[Tooltip.NAME] = JQUERY_NO_CONFLICT$2;
+    return plugin$2;
   };
 
   exports.Collapse = Collapse;
+  exports.Toast = Toast;
   exports.Tooltip = Tooltip;
 
   Object.defineProperty(exports, '__esModule', { value: true });

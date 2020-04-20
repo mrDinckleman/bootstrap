@@ -15,10 +15,9 @@ import Util from './util'
  */
 
 const NAME               = 'toast'
-const VERSION            = '4.4.1'
+// const VERSION            = '4.4.1'
 const DATA_KEY           = 'bs.toast'
 const EVENT_KEY          = `.${DATA_KEY}`
-const JQUERY_NO_CONFLICT = $.fn[NAME]
 
 const Event = {
   CLICK_DISMISS : `click.dismiss${EVENT_KEY}`,
@@ -67,9 +66,9 @@ class Toast {
 
   // Getters
 
-  static get VERSION() {
-    return VERSION
-  }
+  // static get VERSION() {
+  //   return VERSION
+  // }
 
   static get DefaultType() {
     return DefaultType
@@ -79,10 +78,30 @@ class Toast {
     return Default
   }
 
+  static get NAME() {
+    return NAME
+  }
+
+  static get DATA_KEY() {
+    return DATA_KEY
+  }
+
+  static get Event() {
+    return Event
+  }
+
+  static get ClassName() {
+    return ClassName
+  }
+
+  static get Selector() {
+    return Selector
+  }
+
   // Public
 
   show() {
-    const showEvent = $.Event(Event.SHOW)
+    const showEvent = $.Event(this.constructor.Event.SHOW)
 
     $(this._element).trigger(showEvent)
     if (showEvent.isDefaultPrevented()) {
@@ -90,14 +109,14 @@ class Toast {
     }
 
     if (this._config.animation) {
-      this._element.classList.add(ClassName.FADE)
+      this._element.classList.add(this.constructor.ClassName.FADE)
     }
 
     const complete = () => {
-      this._element.classList.remove(ClassName.SHOWING)
-      this._element.classList.add(ClassName.SHOW)
+      this._element.classList.remove(this.constructor.ClassName.SHOWING)
+      this._element.classList.add(this.constructor.ClassName.SHOW)
 
-      $(this._element).trigger(Event.SHOWN)
+      $(this._element).trigger(this.constructor.Event.SHOWN)
 
       if (this._config.autohide) {
         this._timeout = setTimeout(() => {
@@ -106,9 +125,9 @@ class Toast {
       }
     }
 
-    this._element.classList.remove(ClassName.HIDE)
+    this._element.classList.remove(this.constructor.ClassName.HIDE)
     Util.reflow(this._element)
-    this._element.classList.add(ClassName.SHOWING)
+    this._element.classList.add(this.constructor.ClassName.SHOWING)
     if (this._config.animation) {
       const transitionDuration = Util.getTransitionDurationFromElement(this._element)
 
@@ -121,11 +140,11 @@ class Toast {
   }
 
   hide() {
-    if (!this._element.classList.contains(ClassName.SHOW)) {
+    if (!this._element.classList.contains(this.constructor.ClassName.SHOW)) {
       return
     }
 
-    const hideEvent = $.Event(Event.HIDE)
+    const hideEvent = $.Event(this.constructor.Event.HIDE)
 
     $(this._element).trigger(hideEvent)
     if (hideEvent.isDefaultPrevented()) {
@@ -139,13 +158,13 @@ class Toast {
     clearTimeout(this._timeout)
     this._timeout = null
 
-    if (this._element.classList.contains(ClassName.SHOW)) {
-      this._element.classList.remove(ClassName.SHOW)
+    if (this._element.classList.contains(this.constructor.ClassName.SHOW)) {
+      this._element.classList.remove(this.constructor.ClassName.SHOW)
     }
 
-    $(this._element).off(Event.CLICK_DISMISS)
+    $(this._element).off(this.constructor.Event.CLICK_DISMISS)
 
-    $.removeData(this._element, DATA_KEY)
+    $.removeData(this._element, this.constructor.DATA_KEY)
     this._element = null
     this._config  = null
   }
@@ -153,14 +172,16 @@ class Toast {
   // Private
 
   _getConfig(config) {
+    const dataAttributes = $(this._element).data()
+
     config = {
-      ...Default,
-      ...$(this._element).data(),
+      ...this.constructor.Default,
+      ...dataAttributes,
       ...typeof config === 'object' && config ? config : {}
     }
 
     Util.typeCheckConfig(
-      NAME,
+      this.constructor.NAME,
       config,
       this.constructor.DefaultType
     )
@@ -170,19 +191,19 @@ class Toast {
 
   _setListeners() {
     $(this._element).on(
-      Event.CLICK_DISMISS,
-      Selector.DATA_DISMISS,
+      this.constructor.Event.CLICK_DISMISS,
+      this.constructor.Selector.DATA_DISMISS,
       () => this.hide()
     )
   }
 
   _close() {
     const complete = () => {
-      this._element.classList.add(ClassName.HIDE)
-      $(this._element).trigger(Event.HIDDEN)
+      this._element.classList.add(this.constructor.ClassName.HIDE)
+      $(this._element).trigger(this.constructor.Event.HIDDEN)
     }
 
-    this._element.classList.remove(ClassName.SHOW)
+    this._element.classList.remove(this.constructor.ClassName.SHOW)
     if (this._config.animation) {
       const transitionDuration = Util.getTransitionDurationFromElement(this._element)
 
@@ -196,25 +217,26 @@ class Toast {
 
   // Static
 
-  static _jQueryInterface(config) {
-    return this.each(function () {
-      const $element = $(this)
-      let data       = $element.data(DATA_KEY)
-      const _config  = typeof config === 'object' && config
+  static _jQueryInterface(Class) {
+    return function (config) {
+      return this.each(function () {
+        let data      = $(this).data(Class.DATA_KEY)
+        const _config = typeof config === 'object' && config
 
-      if (!data) {
-        data = new Toast(this, _config)
-        $element.data(DATA_KEY, data)
-      }
-
-      if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`)
+        if (!data) {
+          data = new Class(this, _config)
+          $(this).data(Class.DATA_KEY, data)
         }
 
-        data[config](this)
-      }
-    })
+        if (typeof config === 'string') {
+          if (typeof data[config] === 'undefined') {
+            throw new TypeError(`No method named "${config}"`)
+          }
+
+          data[config]()
+        }
+      })
+    }
   }
 }
 
@@ -224,11 +246,14 @@ class Toast {
  * ------------------------------------------------------------------------
  */
 
-$.fn[NAME]             = Toast._jQueryInterface
-$.fn[NAME].Constructor = Toast
-$.fn[NAME].noConflict  = () => {
-  $.fn[NAME] = JQUERY_NO_CONFLICT
-  return Toast._jQueryInterface
+const JQUERY_NO_CONFLICT = $.fn[Toast.NAME]
+const plugin = Toast._jQueryInterface(Toast)
+
+$.fn[Toast.NAME]             = plugin
+$.fn[Toast.NAME].Constructor = Toast
+$.fn[Toast.NAME].noConflict  = () => {
+  $.fn[Toast.NAME] = JQUERY_NO_CONFLICT
+  return plugin
 }
 
 export default Toast
