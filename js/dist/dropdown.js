@@ -475,7 +475,7 @@
           var context = $(toggles[i]).data(Class.DATA_KEY);
           var relatedTarget = {
             relatedTarget: toggles[i]
-          }; // if (event && event.target !== toggles[i] && $.contains(parent, event.target)) {
+          };
 
           if (event && event.target !== toggles[i] && parent.contains(event.target)) {
             continue;
