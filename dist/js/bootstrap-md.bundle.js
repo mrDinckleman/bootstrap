@@ -254,11 +254,203 @@
    * ------------------------------------------------------------------------
    */
 
-  var NAME = 'collapse'; // const VERSION             = '4.4.1'
+  var NAME = 'alert'; // const VERSION             = '4.4.1'
 
-  var DATA_KEY = 'bs.collapse';
+  var DATA_KEY = 'bs.alert';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
+  var Selector = {
+    DISMISS: '[data-dismiss="alert"]'
+  };
+  var Event = {
+    CLOSE: "close" + EVENT_KEY,
+    CLOSED: "closed" + EVENT_KEY,
+    CLICK_DATA_API: "click" + EVENT_KEY + DATA_API_KEY
+  };
+  var ClassName = {
+    ALERT: 'alert',
+    FADE: 'fade',
+    SHOW: 'show'
+  };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
+
+  var Alert =
+  /*#__PURE__*/
+  function () {
+    function Alert(element) {
+      this._element = element;
+    } // Getters
+    // static get VERSION() {
+    //   return VERSION
+    // }
+
+
+    var _proto = Alert.prototype;
+
+    // Public
+    _proto.close = function close(element) {
+      var rootElement = this._element;
+
+      if (element) {
+        rootElement = this._getRootElement(element);
+      }
+
+      var customEvent = this._triggerCloseEvent(rootElement);
+
+      if (customEvent.isDefaultPrevented()) {
+        return;
+      }
+
+      this._removeElement(rootElement);
+    };
+
+    _proto.dispose = function dispose() {
+      $.removeData(this._element, this.constructor.DATA_KEY);
+      this._element = null;
+    } // Private
+    ;
+
+    _proto._getRootElement = function _getRootElement(element) {
+      var selector = Util.getSelectorFromElement(element);
+      var parent = false;
+
+      if (selector) {
+        parent = document.querySelector(selector);
+      }
+
+      if (!parent) {
+        parent = $(element).closest("." + this.constructor.ClassName.ALERT)[0];
+      }
+
+      return parent;
+    };
+
+    _proto._triggerCloseEvent = function _triggerCloseEvent(element) {
+      var closeEvent = $.Event(this.constructor.Event.CLOSE);
+      $(element).trigger(closeEvent);
+      return closeEvent;
+    };
+
+    _proto._removeElement = function _removeElement(element) {
+      var _this = this;
+
+      $(element).removeClass(this.constructor.ClassName.SHOW);
+
+      if (!$(element).hasClass(this.constructor.ClassName.FADE)) {
+        this._destroyElement(element);
+
+        return;
+      }
+
+      var transitionDuration = Util.getTransitionDurationFromElement(element);
+      $(element).one(Util.TRANSITION_END, function (event) {
+        return _this._destroyElement(element, event);
+      }).emulateTransitionEnd(transitionDuration);
+    };
+
+    _proto._destroyElement = function _destroyElement(element) {
+      $(element).detach().trigger(this.constructor.Event.CLOSED).remove();
+    } // Static
+    ;
+
+    Alert._jQueryInterface = function _jQueryInterface(Class) {
+      return function (config) {
+        return this.each(function () {
+          var $element = $(this);
+          var data = $element.data(Class.DATA_KEY);
+
+          if (!data) {
+            data = new Class(this);
+            $element.data(Class.DATA_KEY, data);
+          }
+
+          if (config === 'close') {
+            data[config](this);
+          }
+        });
+      };
+    };
+
+    Alert._handleDismiss = function _handleDismiss(alertInstance) {
+      return function (event) {
+        if (event) {
+          event.preventDefault();
+        }
+
+        alertInstance.close(this);
+      };
+    };
+
+    _createClass(Alert, null, [{
+      key: "NAME",
+      get: function get() {
+        return NAME;
+      }
+    }, {
+      key: "DATA_KEY",
+      get: function get() {
+        return DATA_KEY;
+      }
+    }, {
+      key: "Event",
+      get: function get() {
+        return Event;
+      }
+    }, {
+      key: "ClassName",
+      get: function get() {
+        return ClassName;
+      }
+    }, {
+      key: "Selector",
+      get: function get() {
+        return Selector;
+      }
+    }]);
+
+    return Alert;
+  }();
+  /**
+   * ------------------------------------------------------------------------
+   * Data Api implementation
+   * ------------------------------------------------------------------------
+   */
+
+
+  $(document).on(Alert.Event.CLICK_DATA_API, Alert.Selector.DISMISS, Alert._handleDismiss(new Alert()));
+  /**
+   * ------------------------------------------------------------------------
+   * jQuery
+   * ------------------------------------------------------------------------
+   */
+
+  var JQUERY_NO_CONFLICT = $.fn[Alert.NAME];
+
+  var plugin = Alert._jQueryInterface(Alert);
+
+  $.fn[Alert.NAME] = plugin;
+  $.fn[Alert.NAME].Constructor = Alert;
+
+  $.fn[Alert.NAME].noConflict = function () {
+    $.fn[Alert.NAME] = JQUERY_NO_CONFLICT;
+    return plugin;
+  };
+
+  /**
+   * ------------------------------------------------------------------------
+   * Constants
+   * ------------------------------------------------------------------------
+   */
+
+  var NAME$1 = 'collapse'; // const VERSION             = '4.4.1'
+
+  var DATA_KEY$1 = 'bs.collapse';
+  var EVENT_KEY$1 = "." + DATA_KEY$1;
+  var DATA_API_KEY$1 = '.data-api';
   var Default = {
     toggle: true,
     parent: ''
@@ -267,14 +459,14 @@
     toggle: 'boolean',
     parent: '(string|element)'
   };
-  var Event = {
-    SHOW: "show" + EVENT_KEY,
-    SHOWN: "shown" + EVENT_KEY,
-    HIDE: "hide" + EVENT_KEY,
-    HIDDEN: "hidden" + EVENT_KEY,
-    CLICK_DATA_API: "click" + EVENT_KEY + DATA_API_KEY
+  var Event$1 = {
+    SHOW: "show" + EVENT_KEY$1,
+    SHOWN: "shown" + EVENT_KEY$1,
+    HIDE: "hide" + EVENT_KEY$1,
+    HIDDEN: "hidden" + EVENT_KEY$1,
+    CLICK_DATA_API: "click" + EVENT_KEY$1 + DATA_API_KEY$1
   };
-  var ClassName = {
+  var ClassName$1 = {
     SHOW: 'show',
     COLLAPSE: 'collapse',
     COLLAPSING: 'collapsing' // COLLAPSED  : 'collapsed'
@@ -284,7 +476,7 @@
     WIDTH: 'width',
     HEIGHT: 'height'
   };
-  var Selector = {
+  var Selector$1 = {
     ACTIVES: '.show, .collapsing',
     DATA_TOGGLE: '[data-toggle="collapse"]'
   };
@@ -590,17 +782,17 @@
     }, {
       key: "NAME",
       get: function get() {
-        return NAME;
+        return NAME$1;
       }
     }, {
       key: "DATA_KEY",
       get: function get() {
-        return DATA_KEY;
+        return DATA_KEY$1;
       }
     }, {
       key: "Event",
       get: function get() {
-        return Event;
+        return Event$1;
       }
     }, {
       key: "DefaultType",
@@ -610,12 +802,12 @@
     }, {
       key: "ClassName",
       get: function get() {
-        return ClassName;
+        return ClassName$1;
       }
     }, {
       key: "Selector",
       get: function get() {
-        return Selector;
+        return Selector$1;
       }
     }]);
 
@@ -635,16 +827,16 @@
    * ------------------------------------------------------------------------
    */
 
-  var JQUERY_NO_CONFLICT = $.fn[Collapse.NAME];
+  var JQUERY_NO_CONFLICT$1 = $.fn[Collapse.NAME];
 
-  var plugin = Collapse._jQueryInterface(Collapse);
+  var plugin$1 = Collapse._jQueryInterface(Collapse);
 
-  $.fn[Collapse.NAME] = plugin;
+  $.fn[Collapse.NAME] = plugin$1;
   $.fn[Collapse.NAME].Constructor = Collapse;
 
   $.fn[Collapse.NAME].noConflict = function () {
-    $.fn[Collapse.NAME] = JQUERY_NO_CONFLICT;
-    return plugin;
+    $.fn[Collapse.NAME] = JQUERY_NO_CONFLICT$1;
+    return plugin$1;
   };
 
   function getBoundingClientRect(element) {
@@ -2249,11 +2441,11 @@
    * ------------------------------------------------------------------------
    */
 
-  var NAME$1 = 'dropdown'; // const VERSION                  = '4.4.1'
+  var NAME$2 = 'dropdown'; // const VERSION                  = '4.4.1'
 
-  var DATA_KEY$1 = 'bs.dropdown';
-  var EVENT_KEY$1 = "." + DATA_KEY$1;
-  var DATA_API_KEY$1 = '.data-api';
+  var DATA_KEY$2 = 'bs.dropdown';
+  var EVENT_KEY$2 = "." + DATA_KEY$2;
+  var DATA_API_KEY$2 = '.data-api';
   var ESCAPE_KEYCODE = 27; // KeyboardEvent.which value for Escape (Esc) key
 
   var SPACE_KEYCODE = 32; // KeyboardEvent.which value for space key
@@ -2267,17 +2459,17 @@
   var RIGHT_MOUSE_BUTTON_WHICH = 3; // MouseEvent.which value for the right button (assuming a right-handed mouse)
 
   var REGEXP_KEYDOWN = new RegExp(ARROW_UP_KEYCODE + "|" + ARROW_DOWN_KEYCODE + "|" + ESCAPE_KEYCODE);
-  var Event$1 = {
-    HIDE: "hide" + EVENT_KEY$1,
-    HIDDEN: "hidden" + EVENT_KEY$1,
-    SHOW: "show" + EVENT_KEY$1,
-    SHOWN: "shown" + EVENT_KEY$1,
-    CLICK: "click" + EVENT_KEY$1,
-    CLICK_DATA_API: "click" + EVENT_KEY$1 + DATA_API_KEY$1,
-    KEYDOWN_DATA_API: "keydown" + EVENT_KEY$1 + DATA_API_KEY$1,
-    KEYUP_DATA_API: "keyup" + EVENT_KEY$1 + DATA_API_KEY$1
+  var Event$2 = {
+    HIDE: "hide" + EVENT_KEY$2,
+    HIDDEN: "hidden" + EVENT_KEY$2,
+    SHOW: "show" + EVENT_KEY$2,
+    SHOWN: "shown" + EVENT_KEY$2,
+    CLICK: "click" + EVENT_KEY$2,
+    CLICK_DATA_API: "click" + EVENT_KEY$2 + DATA_API_KEY$2,
+    KEYDOWN_DATA_API: "keydown" + EVENT_KEY$2 + DATA_API_KEY$2,
+    KEYUP_DATA_API: "keyup" + EVENT_KEY$2 + DATA_API_KEY$2
   };
-  var ClassName$1 = {
+  var ClassName$2 = {
     DISABLED: 'disabled',
     SHOW: 'show',
     DROPUP: 'dropup',
@@ -2287,7 +2479,7 @@
     // POSITION_STATIC : 'position-static'
 
   };
-  var Selector$1 = {
+  var Selector$2 = {
     DATA_TOGGLE: '[data-toggle="dropdown"]',
     FORM_CHILD: '.dropdown form',
     MENU: '.dropdown-menu',
@@ -2781,32 +2973,32 @@
     }, {
       key: "NAME",
       get: function get() {
-        return NAME$1;
+        return NAME$2;
       }
     }, {
       key: "DATA_KEY",
       get: function get() {
-        return DATA_KEY$1;
+        return DATA_KEY$2;
       }
     }, {
       key: "Event",
       get: function get() {
-        return Event$1;
+        return Event$2;
       }
     }, {
       key: "EVENT_KEY",
       get: function get() {
-        return EVENT_KEY$1;
+        return EVENT_KEY$2;
       }
     }, {
       key: "ClassName",
       get: function get() {
-        return ClassName$1;
+        return ClassName$2;
       }
     }, {
       key: "Selector",
       get: function get() {
-        return Selector$1;
+        return Selector$2;
       }
     }]);
 
@@ -2833,16 +3025,16 @@
    * ------------------------------------------------------------------------
    */
 
-  var JQUERY_NO_CONFLICT$1 = $.fn[Dropdown.NAME];
+  var JQUERY_NO_CONFLICT$2 = $.fn[Dropdown.NAME];
 
-  var plugin$1 = Dropdown._jQueryInterface(Dropdown);
+  var plugin$2 = Dropdown._jQueryInterface(Dropdown);
 
-  $.fn[Dropdown.NAME] = plugin$1;
+  $.fn[Dropdown.NAME] = plugin$2;
   $.fn[Dropdown.NAME].Constructor = Dropdown;
 
   $.fn[Dropdown.NAME].noConflict = function () {
-    $.fn[Dropdown.NAME] = JQUERY_NO_CONFLICT$1;
-    return plugin$1;
+    $.fn[Dropdown.NAME] = JQUERY_NO_CONFLICT$2;
+    return plugin$2;
   };
 
   /**
@@ -2851,18 +3043,18 @@
    * ------------------------------------------------------------------------
    */
 
-  var NAME$2 = 'toast'; // const VERSION            = '4.4.1'
+  var NAME$3 = 'toast'; // const VERSION            = '4.4.1'
 
-  var DATA_KEY$2 = 'bs.toast';
-  var EVENT_KEY$2 = "." + DATA_KEY$2;
-  var Event$2 = {
-    CLICK_DISMISS: "click.dismiss" + EVENT_KEY$2,
-    HIDE: "hide" + EVENT_KEY$2,
-    HIDDEN: "hidden" + EVENT_KEY$2,
-    SHOW: "show" + EVENT_KEY$2,
-    SHOWN: "shown" + EVENT_KEY$2
+  var DATA_KEY$3 = 'bs.toast';
+  var EVENT_KEY$3 = "." + DATA_KEY$3;
+  var Event$3 = {
+    CLICK_DISMISS: "click.dismiss" + EVENT_KEY$3,
+    HIDE: "hide" + EVENT_KEY$3,
+    HIDDEN: "hidden" + EVENT_KEY$3,
+    SHOW: "show" + EVENT_KEY$3,
+    SHOWN: "shown" + EVENT_KEY$3
   };
-  var ClassName$2 = {
+  var ClassName$3 = {
     FADE: 'fade',
     HIDE: 'hide',
     SHOW: 'show',
@@ -2878,7 +3070,7 @@
     autohide: true,
     delay: 500
   };
-  var Selector$2 = {
+  var Selector$3 = {
     DATA_DISMISS: '[data-dismiss="toast"]'
   };
   /**
@@ -3048,27 +3240,27 @@
     }, {
       key: "NAME",
       get: function get() {
-        return NAME$2;
+        return NAME$3;
       }
     }, {
       key: "DATA_KEY",
       get: function get() {
-        return DATA_KEY$2;
+        return DATA_KEY$3;
       }
     }, {
       key: "Event",
       get: function get() {
-        return Event$2;
+        return Event$3;
       }
     }, {
       key: "ClassName",
       get: function get() {
-        return ClassName$2;
+        return ClassName$3;
       }
     }, {
       key: "Selector",
       get: function get() {
-        return Selector$2;
+        return Selector$3;
       }
     }]);
 
@@ -3081,16 +3273,16 @@
    */
 
 
-  var JQUERY_NO_CONFLICT$2 = $.fn[Toast.NAME];
+  var JQUERY_NO_CONFLICT$3 = $.fn[Toast.NAME];
 
-  var plugin$2 = Toast._jQueryInterface(Toast);
+  var plugin$3 = Toast._jQueryInterface(Toast);
 
-  $.fn[Toast.NAME] = plugin$2;
+  $.fn[Toast.NAME] = plugin$3;
   $.fn[Toast.NAME].Constructor = Toast;
 
   $.fn[Toast.NAME].noConflict = function () {
-    $.fn[Toast.NAME] = JQUERY_NO_CONFLICT$2;
-    return plugin$2;
+    $.fn[Toast.NAME] = JQUERY_NO_CONFLICT$3;
+    return plugin$3;
   };
 
   /**
@@ -3220,10 +3412,10 @@
    * ------------------------------------------------------------------------
    */
 
-  var NAME$3 = 'tooltip'; // const VERSION               = '4.4.1'
+  var NAME$4 = 'tooltip'; // const VERSION               = '4.4.1'
 
-  var DATA_KEY$3 = 'bs.tooltip';
-  var EVENT_KEY$3 = "." + DATA_KEY$3; // const CLASS_PREFIX          = 'bs-tooltip'
+  var DATA_KEY$4 = 'bs.tooltip';
+  var EVENT_KEY$4 = "." + DATA_KEY$4; // const CLASS_PREFIX          = 'bs-tooltip'
   // const BSCLS_PREFIX_REGEX    = new RegExp(`(^|\\s)${CLASS_PREFIX}\\S+`, 'g')
 
   var DISALLOWED_ATTRIBUTES = ['sanitize', 'whiteList', 'sanitizeFn'];
@@ -3274,23 +3466,23 @@
     SHOW: 'show',
     OUT: 'out'
   };
-  var Event$3 = {
-    HIDE: "hide" + EVENT_KEY$3,
-    HIDDEN: "hidden" + EVENT_KEY$3,
-    SHOW: "show" + EVENT_KEY$3,
-    SHOWN: "shown" + EVENT_KEY$3,
-    INSERTED: "inserted" + EVENT_KEY$3,
-    CLICK: "click" + EVENT_KEY$3,
-    FOCUSIN: "focusin" + EVENT_KEY$3,
-    FOCUSOUT: "focusout" + EVENT_KEY$3,
-    MOUSEENTER: "mouseenter" + EVENT_KEY$3,
-    MOUSELEAVE: "mouseleave" + EVENT_KEY$3
+  var Event$4 = {
+    HIDE: "hide" + EVENT_KEY$4,
+    HIDDEN: "hidden" + EVENT_KEY$4,
+    SHOW: "show" + EVENT_KEY$4,
+    SHOWN: "shown" + EVENT_KEY$4,
+    INSERTED: "inserted" + EVENT_KEY$4,
+    CLICK: "click" + EVENT_KEY$4,
+    FOCUSIN: "focusin" + EVENT_KEY$4,
+    FOCUSOUT: "focusout" + EVENT_KEY$4,
+    MOUSEENTER: "mouseenter" + EVENT_KEY$4,
+    MOUSELEAVE: "mouseleave" + EVENT_KEY$4
   };
-  var ClassName$3 = {
+  var ClassName$4 = {
     FADE: 'fade',
     SHOW: 'show'
   };
-  var Selector$3 = {
+  var Selector$4 = {
     TOOLTIP: '.tooltip',
     TOOLTIP_INNER: '.tooltip-inner',
     ARROW: '.arrow'
@@ -3896,22 +4088,22 @@
     }, {
       key: "NAME",
       get: function get() {
-        return NAME$3;
+        return NAME$4;
       }
     }, {
       key: "DATA_KEY",
       get: function get() {
-        return DATA_KEY$3;
+        return DATA_KEY$4;
       }
     }, {
       key: "Event",
       get: function get() {
-        return Event$3;
+        return Event$4;
       }
     }, {
       key: "EVENT_KEY",
       get: function get() {
-        return EVENT_KEY$3;
+        return EVENT_KEY$4;
       }
     }, {
       key: "DefaultType",
@@ -3921,12 +4113,12 @@
     }, {
       key: "ClassName",
       get: function get() {
-        return ClassName$3;
+        return ClassName$4;
       }
     }, {
       key: "Selector",
       get: function get() {
-        return Selector$3;
+        return Selector$4;
       }
     }]);
 
@@ -3939,18 +4131,19 @@
    */
 
 
-  var JQUERY_NO_CONFLICT$3 = $.fn[Tooltip.NAME];
+  var JQUERY_NO_CONFLICT$4 = $.fn[Tooltip.NAME];
 
-  var plugin$3 = Tooltip._jQueryInterface(Tooltip);
+  var plugin$4 = Tooltip._jQueryInterface(Tooltip);
 
-  $.fn[Tooltip.NAME] = plugin$3;
+  $.fn[Tooltip.NAME] = plugin$4;
   $.fn[Tooltip.NAME].Constructor = Tooltip;
 
   $.fn[Tooltip.NAME].noConflict = function () {
-    $.fn[Tooltip.NAME] = JQUERY_NO_CONFLICT$3;
-    return plugin$3;
+    $.fn[Tooltip.NAME] = JQUERY_NO_CONFLICT$4;
+    return plugin$4;
   };
 
+  exports.Alert = Alert;
   exports.Collapse = Collapse;
   exports.Dropdown = Dropdown;
   exports.Toast = Toast;

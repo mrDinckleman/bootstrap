@@ -30,7 +30,7 @@ const plugins = [
   })
 ]
 const bsPlugins = {
-  // Alert: path.resolve(__dirname, '../js/src/alert.js'),
+  Alert: path.resolve(__dirname, '../js/src/alert.js'),
   // Button: path.resolve(__dirname, '../js/src/button.js'),
   // Carousel: path.resolve(__dirname, '../js/src/carousel.js'),
   Collapse: path.resolve(__dirname, '../js/src/collapse.js'),

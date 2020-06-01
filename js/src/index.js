@@ -1,4 +1,4 @@
-// import Alert from './alert'
+import Alert from './alert'
 // import Button from './button'
 // import Carousel from './carousel'
 import Collapse from './collapse'
@@ -20,7 +20,7 @@ import Tooltip from './tooltip'
 
 export {
   // Util,
-  // Alert,
+  Alert,
   // Button,
   // Carousel,
   Collapse,
